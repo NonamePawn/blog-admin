@@ -1,22 +1,36 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
+
+const Login = () => import('../views/login/Login')
+const Home = () => import('../views/home/Home')
+const Welcome = () => import('../views/home/Welcome')
+const Users = () => import('../views/home/users/Users')
+const Donate = () => import('../views/home/donate/Donate')
+const Category = () => import('../views/home/category/Category')
+const Comment = () => import('../views/home/comment/Comment')
 
 Vue.use(VueRouter)
 
   const routes = [
   {
-    path: '/',
-    name: 'Home',
-    component: Home
+    path: '',
+    redirect: '/login'
   },
   {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    path: '/login',
+    component: Login
+  },
+  {
+    path: '/home',
+    component: Home,
+    redirect: '/welcome',
+    children: [
+      {path: '/welcome', component: Welcome},
+      {path: '/users', component: Users},
+      {path: '/donate', component: Donate},
+      {path: '/category', component: Category},
+      {path: '/comments', component: Comment}
+    ]
   }
 ]
 
