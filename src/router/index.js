@@ -8,6 +8,10 @@ const Users = () => import('../views/home/users/Users')
 const Donate = () => import('../views/home/donate/Donate')
 const Category = () => import('../views/home/category/Category')
 const Comment = () => import('../views/home/comment/Comment')
+const About = () => import('../views/home/about/About')
+const Article = () => import('../views/home/article/Article')
+const Add = () => import('../views/home/article/Add')
+const Edit = () => import('../views/home/article/Edit')
 
 Vue.use(VueRouter)
 
@@ -29,7 +33,11 @@ Vue.use(VueRouter)
       {path: '/users', component: Users},
       {path: '/donate', component: Donate},
       {path: '/category', component: Category},
-      {path: '/comments', component: Comment}
+      {path: '/comments', component: Comment},
+      {path: '/about', component: About},
+      {path: '/article', component: Article},
+      {path: '/article/add', component: Add},
+      {path: '/article/edit', component: Edit}
     ]
   }
 ]

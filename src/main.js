@@ -4,6 +4,7 @@ import router from './router'
 import './plugins/element'
 import './plugins/snow'
 import './plugins/tree-grid'
+import './plugins/mavonEditor'
 import './network/request'
 
 Vue.config.productionTip = false

@@ -21,7 +21,8 @@ export async function Save(that, path, message, addForm) {
 export async function Read(that, path, message, id) {
   // 发送GET请求
   const {data : result} = await that.$http.get('admin/' + path + '/' + id)
-  if (result.meta.status !== 200) return this.$message.error(message + "失败")
+  if (result.meta.status !== 200) return that.$message.error(message + "失败")
+  that.$message.success(message + "成功")
   return result.data
 }
 

@@ -1,20 +1,23 @@
 <template>
   <div class="category">
-    <tree
+    <list
             key-word="分类"
             path="category"
+            tips="文章数不为0的分类不可删除"
             :columns="columns"
+            :is-tree="true"
+            :is-category="true"
             :add-field="addField"
-            :add-form-rules="addFormRules"></tree>
+            :add-form-rules="addFormRules"></list>
   </div>
 </template>
 
 <script>
-  import Tree from "../../../components/content/Tree";
+  import List from "../../../components/content/List";
   export default {
     name: 'Category',
     components: {
-      Tree
+      List
     },
     data() {
       return {
@@ -26,6 +29,10 @@
           {
             label: '创建时间',
             prop: 'create_time'
+          },
+          {
+            label: '文章数',
+            prop: 'count'
           },
           {
             label: '排序',

@@ -1,23 +1,22 @@
 <template>
   <div class="comment">
-    <tree
+    <List
             key-word="评论"
             path="comment"
+            tips="请在搜索框中输入文章ID进行搜索"
             :is-add="false"
-            :has-status="true"
-            :is-view="true"
-            :is-reply="true"
+            :is-tree="true"
             :add-field="addField"
-            :columns="columns"></tree>
+            :columns="columns"></List>
   </div>
 </template>
 
 <script>
-  import Tree from "../../../components/content/Tree";
+  import List from "../../../components/content/List";
   export default {
     name: "Comment",
     components: {
-      Tree
+      List
     },
     data() {
       return {

@@ -4,6 +4,7 @@
             key-word="用户"
             path="users"
             :field="field"
+            :has-status="true"
             :edit-form-rules="editFormRules"
             :add-form-rules="addFormRules"
             :add-field="addField"

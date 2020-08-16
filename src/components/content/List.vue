@@ -1,13 +1,10 @@
 <template>
     <div>
       <!--面包屑区域-->
-      <el-breadcrumb separator-class="el-icon-arrow-right" style="margin-bottom: 15px">
-        <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
-        <el-breadcrumb-item>{{keyWord}}管理</el-breadcrumb-item>
-        <el-breadcrumb-item>{{keyWord}}列表</el-breadcrumb-item>
-      </el-breadcrumb>
+      <bread-crumb :key-word="keyWord"></bread-crumb>
       <!--卡片区域-->
       <el-card>
+        <el-alert :title="tips" type="warning" v-if="tips" style="margin-bottom: 15px"></el-alert>
         <!--搜索与添加区域-->
         <el-row :gutter="20">
           <el-col :span="8">
@@ -15,12 +12,46 @@
               <el-button slot="append" icon="el-icon-search" @click="getList"></el-button>
             </el-input>
           </el-col>
-          <el-col :span="4">
-            <el-button type="primary" @click="addDialogVisibleShow">添加{{keyWord}}</el-button>
+          <el-col :span="4"  v-if="isAdd">
+            <el-button type="primary" @click="showAddDialog">添加{{keyWord}}</el-button>
           </el-col>
         </el-row>
-        <!--列表区域-->
-        <el-table :data="list" border stripe style="margin-top: 15px;font-size: 12px">
+        <!--树形列表-->
+        <tree-table
+                v-if="isTree"
+                style="margin-top: 15px;font-size: 12px"
+                :data="list"
+                :columns="columns"
+                :selection-type="false"
+                :expand-type="false"
+                show-index
+                :show-row-hover="true"
+                :tree-type="true"
+                index-text="#"
+                border>
+          <template slot="status" slot-scope="scope" v-if="!isCategory">
+            <el-switch v-model="scope.row.status" @change="StateChange(scope.row)"></el-switch>
+            <el-tag size="mini" style="margin-left: 5px; border-radius: 50%" type="info">{{scope.row.a_id}}</el-tag>
+          </template>
+          <template slot="order" slot-scope="scope">
+            <el-tag type="primary" size="mini" v-if="scope.row.level === 1">一级</el-tag>
+            <el-tag type="success" size="mini" v-else-if="scope.row.level === 2">二级</el-tag>
+            <el-tag type="warning" size="mini" v-else-if="scope.row.level === 3">三级</el-tag>
+            <el-tag type="info" size="mini" v-else>四级</el-tag>
+          </template>
+          <template slot="OP" slot-scope="scope">
+            <el-button type="success" icon="el-icon-s-comment" size="mini" @click="ViewContent(scope.row)" v-if="!isCategory">查看</el-button>
+            <el-button type="warning" icon="el-icon-s-promotion" size="mini" @click="showReplyDialog(scope.row)" v-if="!isCategory">回复</el-button>
+            <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteByID(scope.row.id)">删除</el-button>
+          </template>
+        </tree-table>
+        <!--普通列表区域-->
+        <el-table
+                v-else
+                :data="list"
+                border
+                stripe
+                style="margin-top: 15px;font-size: 12px">
           <el-table-column type="index"></el-table-column>
           <el-table-column :label="item.label" :prop="item.prop" :width="item.width" v-for="item in field"></el-table-column>
           <el-table-column label="状态" width="70px" v-if="hasStatus">
@@ -51,10 +82,26 @@
                 :title="'添加'+keyWord"
                 :visible.sync="addDialogVisible"
                 width="50%"
-                @close="addDialogClose">
+                @close="closeAddDialog">
           <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="70px">
             <el-form-item :label="item.label" :prop="item.prop" v-for="item in addField">
-              <el-input v-model="addForm[item.prop]"></el-input>
+              <el-input v-model="addForm[item.prop]" :disabled="item.disabled"></el-input>
+            </el-form-item>
+            <el-form-item label="父级分类" v-if="isCategory">
+              <el-cascader
+                      style="width: 100%"
+                      v-model="selectedKeys"
+                      :options="list"
+                      :props="{
+                      expandTrigger: 'hover',
+                      value: 'id',
+                      label: 'name',
+                      children: 'children',
+                      checkStrictly: true
+                    }"
+                      @change="ParentChanged"
+                      clearable
+              ></el-cascader>
             </el-form-item>
           </el-form>
           <span slot="footer" class="dialog-footer">
@@ -84,14 +131,54 @@
 
 <script>
   import {Delete, Index, Put, Read, Save} from "../../network/home";
+  import BreadCrumb from "./BreadCrumb";
 
   export default {
     name: "List",
+    components: {
+      BreadCrumb
+    },
     props: {
       keyWord: {
         type: String,
         default () {
           return ''
+        }
+      },
+      isAdd: {
+        type: Boolean,
+        default() {
+          return true
+        }
+      },
+      isTree: {
+        type: Boolean,
+        default() {
+          return false
+        }
+      },
+      isCategory: {
+        type: Boolean,
+        default() {
+          return false
+        }
+      },
+      goToAdd: {
+        type: Boolean,
+        default() {
+          return false
+        }
+      },
+      tips: {
+        type: String,
+        default() {
+          return ''
+        }
+      },
+      columns: {
+        type: Array,
+        default() {
+          return []
         }
       },
       field: {
@@ -103,7 +190,7 @@
       hasStatus: {
         type: Boolean,
         default() {
-          return true
+          return false
         }
       },
       path: {
@@ -152,15 +239,47 @@
         addDialogVisible: false,
         editDialogVisible: false,
         editForm: {},
-        addForm: {}
+        addForm: {},
+        selectedKeys: [],
       }
     },
     created() {
       this.getList()
     },
     methods: {
-      addDialogVisibleShow() {
+      async getList() {
+        let result = await Index(this, this.path, '获取'+this.keyWord, this.queryInfo);
+        this.list = result.data
+        this.total = result.total
+      },
+      showAddDialog() {
+        if (this.goToAdd) this.$router.push('/article/add')
         this.addDialogVisible = true
+      },
+      showReplyDialog(row) {
+        this.addForm.username = row.username
+        this.addForm.title = row.title
+        this.addForm.p_id = row.u_id
+        this.addForm.a_id = row.a_id
+        this.addForm.u_id = 1
+        this.addForm.content = ''
+        this.addDialogVisible = true
+      },
+      ViewContent(row) {
+        this.$notify({
+          title: row.username,
+          message: row.comment,
+        });
+      },
+      async StateChange(row) {
+        await Put(this, this.path, '更新'+this.keyWord, row.id, {status: row.status})
+      },
+      closeAddDialog() {
+        if (this.isCategory) {
+          this.selectedKeys = []
+          this.addForm.p_id =  0
+        }
+        this.$refs.addFormRef.resetFields()
       },
       add() {
         let that = this
@@ -171,20 +290,31 @@
           this.getList()
         })
       },
+      async editDialogVisibleShow(id) {
+        if (this.goToAdd) {
+          await this.$router.push({path:'/article/edit',query:{a_id:id}})
+        }
+        this.editForm = await Read(this, this.path, '查询'+this.keyWord, id)
+        this.editDialogVisible = true
+      },
+      editDialogClose() {
+        this.$refs.editFormRef.resetFields()
+      },
       edit() {
         let that = this
         this.$refs.editFormRef.validate(async valid => {
           if (!valid) return false
-          await Put(that, this.path, '更新'+this.keyWord, this.editForm.id, { email : this.editForm.email})
+          await Put(that, this.path, '更新'+this.keyWord, this.editForm.id, this.editForm)
           this.editDialogVisible = false
           this.getList()
         })
       },
-      addDialogClose() {
-        this.$refs.addFormRef.resetFields()
-      },
-      editDialogClose() {
-        this.$refs.editFormRef.resetFields()
+      ParentChanged() {
+        if (this.selectedKeys.length > 0){
+          this.addForm.p_id = this.selectedKeys[this.selectedKeys.length - 1]
+        }else {
+          this.addForm.p_id =  0
+        }
       },
       deleteByID(id) {
         let that = this
@@ -206,18 +336,6 @@
       handleCurrentChange(newValue){
         this.queryInfo.pageNum = newValue
         this.getList()
-      },
-      async getList() {
-        let result = await Index(this, this.path, '获取'+this.keyWord, this.queryInfo);
-        this.list = result.data
-        this.total = result.total
-      },
-      async StateChange(row) {
-        await Put(this, this.path, '更新'+this.keyWord, row.id, {status: row.status})
-      },
-      async editDialogVisibleShow(id) {
-        this.editForm = await Read(this, this.path, '查询'+this.keyWord, id)
-        this.editDialogVisible = true
       },
     }
   }

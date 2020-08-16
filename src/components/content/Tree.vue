@@ -1,15 +1,11 @@
 <template>
   <div>
     <!--面包屑区域-->
-    <el-breadcrumb separator-class="el-icon-arrow-right" style="margin-bottom: 15px">
-      <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>{{keyWord}}管理</el-breadcrumb-item>
-      <el-breadcrumb-item>{{keyWord}}列表</el-breadcrumb-item>
-    </el-breadcrumb>
+    <bread-crumb :key-word="keyWord"></bread-crumb>
     <!--卡片区域-->
     <el-card>
-      <el-alert title="请在搜索框输入文章ID进行查询" type="warning" v-if="!isAdd" style="margin-bottom: 15px">
-      </el-alert>
+      <el-alert :title="tips" type="warning" v-if="tips" style="margin-bottom: 15px"></el-alert>
+      <!--搜索与添加区域-->
       <el-row :gutter="20">
         <el-col :span="8">
           <el-input placeholder="请输入内容" clearable @clear="getList" v-model="queryInfo.query">
@@ -43,7 +39,7 @@
           <el-tag type="info" size="mini" v-else>四级</el-tag>
         </template>
         <template slot="OP" slot-scope="scope">
-          <el-button type="success" icon="el-icon-s-comment" size="mini" @click="ViewContent(scope.row.comment)" v-if="isView">查看</el-button>
+          <el-button type="success" icon="el-icon-s-comment" size="mini" @click="ViewContent(scope.row)" v-if="isView">查看</el-button>
           <el-button type="warning" icon="el-icon-s-promotion" size="mini" @click="showReplyDialog(scope.row)" v-if="isReply">回复</el-button>
           <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteByID(scope.row.id)">删除</el-button>
         </template>
@@ -60,7 +56,7 @@
               :total="total">
       </el-pagination>
     </el-card>
-    <!--添加分类的对话框-->
+    <!--添加操作的对话框-->
     <el-dialog
             :title="'添加' + keyWord"
             :visible.sync="addDialogVisible"
@@ -97,11 +93,20 @@
 
 <script>
   import {Delete, Index, Put, Save} from "../../network/home";
-
+  import BreadCrumb from "./BreadCrumb";
   export default {
     name: "Tree",
+    components: {
+      BreadCrumb
+    },
     props: {
       keyWord: {
+        type: String,
+        default() {
+          return ''
+        }
+      },
+      tips: {
         type: String,
         default() {
           return ''
@@ -116,7 +121,7 @@
       columns: {
         type: Array,
         default() {
-          return {}
+          return []
         }
       },
       isAdd: {
@@ -196,10 +201,10 @@
         this.selectedKeys = []
         this.addForm.p_id =  0
       },
-      ViewContent(comment) {
+      ViewContent(row) {
         this.$notify({
-          title: '评论内容',
-          message: comment,
+          title: row.username,
+          message: row.comment,
         });
       },
       ParentChanged() {
