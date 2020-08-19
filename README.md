@@ -4,7 +4,7 @@
 
 > 用于管理用户，管理分类，管理文章，管理评论，数据统计等业务功能
 
-![admin](README.assets\admin.png)
+![admin](\README.assets\admin.png)
 
 # 项目预览
 
