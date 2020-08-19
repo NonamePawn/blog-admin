@@ -4,31 +4,31 @@
 
 > 用于管理用户，管理分类，管理文章，管理评论，数据统计等业务功能
 
-![admin](\README.assets\admin.png)
+![admin](README.assets\admin.png)
 
 # 项目预览
 
 登录界面
 
-![image-20200819103554543](D:\Blog_admin\blog-admin\README.assets\image-20200819103554543.png)
+![image-20200819103554543](README.assets\image-20200819103554543.png)
 
 登录后跳转至数据统计界面
 
 数据统计
 
-![image-20200819145615080](D:\Blog_admin\blog-admin\README.assets\image-20200819145615080.png)
+![image-20200819145615080](README.assets\image-20200819145615080.png)
 
 用户管理
 
-![image-20200819145643587](D:\Blog_admin\blog-admin\README.assets\image-20200819145643587.png)
+![image-20200819145643587](README.assets\image-20200819145643587.png)
 
 分类管理
 
-![image-20200819145705390](D:\Blog_admin\blog-admin\README.assets\image-20200819145705390.png)
+![image-20200819145705390](README.assets\image-20200819145705390.png)
 
 文章管理
 
-![image-20200819145729377](D:\Blog_admin\blog-admin\README.assets\image-20200819145729377.png)
+![image-20200819145729377](README.assets\image-20200819145729377.png)
 
 添加文章
 
