@@ -39,7 +39,7 @@
             label: '是否通过',
             type: 'template',
             template: 'status',
-            width: 90
+            width: 100
           },
           {
             label: '排序',

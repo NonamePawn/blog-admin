@@ -83,7 +83,7 @@
                 :visible.sync="addDialogVisible"
                 width="50%"
                 @close="closeAddDialog">
-          <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="70px">
+          <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="100px">
             <el-form-item :label="item.label" :prop="item.prop" v-for="item in addField">
               <el-input v-model="addForm[item.prop]" :disabled="item.disabled"></el-input>
             </el-form-item>
@@ -253,8 +253,12 @@
         this.total = result.total
       },
       showAddDialog() {
-        if (this.goToAdd) this.$router.push('/article/add')
-        this.addDialogVisible = true
+        if (this.goToAdd) {
+          this.$router.push('/article/add')
+        }
+        else{
+          this.addDialogVisible = true
+        }
       },
       showReplyDialog(row) {
         this.addForm.username = row.username

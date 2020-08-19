@@ -71,7 +71,7 @@
     },
     async created() {
       // 获取菜单数据
-      let result = await Index(this,'manager','获取路径');
+      let result = await Index(this,'manager','获取路径', {}, false);
       this.menuList = result.data
     },
     methods: {

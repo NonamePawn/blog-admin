@@ -36,8 +36,10 @@
                     trigger: 'hover',
                     label: 'name',
                     value: 'id',
-                    children: 'children'
-                  }"
+                    children: 'children',
+                    checkStrictly: true
+                     }"
+                      clearable
                       @change="handleChange"></el-cascader>
             </el-form-item>
           </el-tab-pane>
@@ -51,7 +53,7 @@
 </template>
 
 <script>
-  import {Index} from "../../../network/home";
+  import {Index, Save} from "../../../network/home";
 
   export default {
     name: "Add",
@@ -94,8 +96,8 @@
           /* 1.4.2 */
           navigation: true // 导航目录
         },
-        cateList: [],
         activeIndex: '0',
+        cateList: [],
         selectedKeys: []
       }
     },
@@ -104,27 +106,27 @@
     },
     methods: {
       async getList() {
-        let result = await Index(this, 'category', '获取分类');
+        let result = await Index(this, 'category', '获取分类', {}, false);
         this.cateList = result.data
       },
       handleChange() {
-        if (this.selectedKeys.length !== 3) {
-          this.selectedKeys = []
-        }else {
-          this.addForm.c_id = this.selectedKeys[2]
+        if (this.selectedKeys.length !== 0) {
+          this.addForm.c_id = this.selectedKeys[this.selectedKeys.length - 1]
         }
       },
       beforeTabLeave(activeName, oldActiveName) {
-        if (oldActiveName === '0' && this.selectedKeys.length !== 3) {
+        if (oldActiveName === '0' && this.selectedKeys.length === 0) {
           this.$message.error('请先选择分类')
           return false
         }
       },
       add() {
+        let that = this
         this.$refs.addFormRef.validate(async valid => {
           if (!valid) {
             return this.$message.error('请填写必要的表单项')
           }
+          await Save(that, 'article', '添加文章', this.addForm);
           await this.$router.push('/article')
         })
       }

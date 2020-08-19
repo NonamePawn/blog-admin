@@ -14,12 +14,13 @@
                 :label="item.options"
                 :name="item.id+''">
           <el-alert
+                  style="margin-bottom: 5px"
                   title="最后更新时间"
                   type="success"
                   :description="item.update_time"
                   show-icon>
           </el-alert>
-          <mavon-editor v-model="item.content" :toolbars="toolbars" @save="save(item)"/>
+          <mavon-editor v-model="item.content" :toolbars="toolbars" @save="save(item)" style="height: 360px"/>
         </el-tab-pane>
       </el-tabs>
     </el-card>

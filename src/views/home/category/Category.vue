@@ -32,7 +32,7 @@
           },
           {
             label: '文章数',
-            prop: 'count'
+            prop: 'value'
           },
           {
             label: '排序',

@@ -1,10 +1,10 @@
 // 获取数据列表
-export async function Index(that, path, message, queryInfo) {
+export async function Index(that, path, message, queryInfo, showMsg= true) {
   // 发送Get请求
   const {data: result} = await that.$http.get('admin/' + path, {params: queryInfo})
   // 判断请求是否成功
   if (result.meta.status !== 200) return that.$message.error(message + "失败")
-  that.$message.success(message + "成功")
+  if (showMsg) that.$message.success(message + "成功")
   return result.data
 }
 
